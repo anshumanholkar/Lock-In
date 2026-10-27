@@ -11,10 +11,11 @@
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════ LANDING PAGE ═══ -->
+  <!-- ════════════════════════════════════ LANDING PAGE ════ -->
   <div id="page-landing" class="page active">
     <div class="landing-bg"></div>
     <div class="landing-content">
+
       <div class="logo-block">
         <div class="logo-icon">🔒</div>
         <h1 class="logo-title">LOCK IN</h1>
@@ -24,8 +25,10 @@
       <div class="landing-card">
         <div class="api-section">
           <label class="field-label">🤖 Gemini API Key <span class="req">(for AI Analysis)</span></label>
-          <input type="password" id="api-key-input" class="input-field" placeholder="AIza..." />
-          <button class="btn-ghost btn-sm" onclick="saveApiKey()">Save Key</button>
+          <div style="display:flex;gap:0.5rem;align-items:center">
+            <input type="password" id="api-key-input" class="input-field" placeholder="AIza..." style="flex:1" />
+            <button class="btn-ghost btn-sm" onclick="saveApiKey()">Save</button>
+          </div>
           <span id="api-key-status" class="key-status"></span>
         </div>
 
@@ -40,20 +43,64 @@
         <div id="auth-join" class="auth-form active">
           <label class="field-label">Your Name</label>
           <input type="text" id="join-name" class="input-field" placeholder="Enter your name..." maxlength="30" />
-          <label class="field-label">5-Digit Group Code</label>
-          <input type="text" id="join-code" class="input-field code-input" placeholder="e.g. AB3X7" maxlength="5" oninput="this.value=this.value.toUpperCase()" />
+          <label class="field-label">5-Character Group Code</label>
+          <input type="text" id="join-code" class="input-field code-input" placeholder="AB3X7" maxlength="5"
+            oninput="this.value=this.value.toUpperCase()" />
           <button class="btn-primary" onclick="joinGroup()">🔓 JOIN GROUP</button>
           <p id="join-error" class="error-msg"></p>
         </div>
 
-        <!-- CREATE -->
+        <!-- CREATE Step 1 -->
         <div id="auth-create" class="auth-form">
-          <label class="field-label">Your Name</label>
-          <input type="text" id="create-name" class="input-field" placeholder="Enter your name..." maxlength="30" />
-          <label class="field-label">Group Name</label>
-          <input type="text" id="create-group-name" class="input-field" placeholder="e.g. Alpha Squad..." maxlength="40" />
-          <button class="btn-primary" onclick="createGroup()">⚡ CREATE GROUP</button>
-          <p id="create-error" class="error-msg"></p>
+          <div id="create-step-1">
+            <div style="display:flex;flex-direction:column;gap:0.8rem">
+              <div>
+                <label class="field-label">Your Name</label>
+                <input type="text" id="create-name" class="input-field" placeholder="Enter your name..." maxlength="30" />
+              </div>
+              <div>
+                <label class="field-label">Group Name</label>
+                <input type="text" id="create-group-name" class="input-field" placeholder="e.g. Alpha Squad..." maxlength="40" />
+              </div>
+              <button class="btn-primary" onclick="goToHabitPicker()">NEXT → PICK HABITS ⚡</button>
+              <p id="create-error" class="error-msg"></p>
+            </div>
+          </div>
+
+          <!-- CREATE Step 2: Habit Picker -->
+          <div id="create-step-2" style="display:none">
+            <div class="habit-picker-header">
+              <button class="btn-ghost btn-sm" onclick="backToStep1()">← Back</button>
+              <div class="habit-picker-title">📋 PICK YOUR DAILY HABITS</div>
+              <div class="habit-picker-sub">Tap to select what your group tracks every day. Glowing cyan = selected.</div>
+            </div>
+
+            <div class="habit-presets-grid" id="habit-presets-grid">
+              <!-- Rendered by JS -->
+            </div>
+
+            <div class="add-custom-wrap">
+              <button class="btn-secondary" onclick="showCustomHabitForm()">+ Add Custom Habit</button>
+            </div>
+
+            <div id="custom-habit-form" class="custom-habit-form" style="display:none">
+              <div class="field-label">Habit Name</div>
+              <input type="text" id="custom-habit-name" class="input-field" placeholder="e.g. Language Learning" maxlength="30" />
+              <div class="field-label" style="margin-top:0.6rem">Tracking Type</div>
+              <div class="toggle-group" style="margin-bottom:0.6rem">
+                <button class="toggle-btn active" id="ch-yesno" onclick="setCustomType('yesno')">Yes / No</button>
+                <button class="toggle-btn" id="ch-hours" onclick="setCustomType('hours')">Hours</button>
+                <button class="toggle-btn" id="ch-minutes" onclick="setCustomType('minutes')">Minutes</button>
+              </div>
+              <div class="field-label">Points <span class="req">(1–30)</span></div>
+              <input type="number" id="custom-habit-pts" class="input-field" value="10" min="1" max="30" />
+              <button class="btn-primary" style="margin-top:0.7rem;width:100%;font-size:0.9rem;padding:0.6rem" onclick="addCustomHabit()">✓ Add This Habit</button>
+            </div>
+
+            <div id="selected-count-label" class="selected-count"></div>
+            <button class="btn-primary btn-full" onclick="createGroup()" style="margin-top:0.8rem">⚡ CREATE GROUP</button>
+            <p id="create-error-2" class="error-msg"></p>
+          </div>
         </div>
       </div>
 
@@ -61,10 +108,9 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════ DASHBOARD PAGE ═══ -->
+  <!-- ════════════════════════════════════ DASHBOARD PAGE ════ -->
   <div id="page-dashboard" class="page">
 
-    <!-- TOP BAR -->
     <div class="topbar">
       <div class="topbar-left">
         <span class="topbar-logo">🔒 LOCK IN</span>
@@ -76,7 +122,6 @@
       </div>
     </div>
 
-    <!-- TABS -->
     <div class="tab-bar">
       <button class="tab-btn active" onclick="switchTab('home')" id="tab-home">🏠 Home</button>
       <button class="tab-btn" onclick="switchTab('report')" id="tab-report">📋 Report</button>
@@ -85,7 +130,7 @@
       <button class="tab-btn" onclick="switchTab('profile')" id="tab-profile">👤 Profile</button>
     </div>
 
-    <!-- ── HOME TAB ── -->
+    <!-- HOME TAB -->
     <div id="tab-content-home" class="tab-content active">
       <div class="quote-banner" id="daily-quote"></div>
 
@@ -98,7 +143,7 @@
         <div class="info-card">
           <div class="info-card-label">YOUR SCORE TODAY</div>
           <div class="info-card-value score-big" id="home-today-score">—</div>
-          <div class="info-card-sub">out of 100</div>
+          <div class="info-card-sub" id="home-today-max">out of —</div>
         </div>
       </div>
 
@@ -106,69 +151,29 @@
         ⚠️ DISCIPLINE WARNING — You've missed 2+ days. Shape up or you're out.
       </div>
 
-      <div class="section-title">📊 TODAY'S STATUS — WHO'S IN</div>
+      <div class="section-title">📊 TODAY'S STATUS</div>
       <div id="home-members-list" class="members-grid"></div>
+
+      <div class="section-title" style="margin-top:1rem">📋 GROUP HABITS</div>
+      <div id="home-habits-list" class="habits-summary-grid"></div>
 
       <div class="motto-block">
         <p>"Comfort is no option. Discipline is mandatory."</p>
       </div>
     </div>
 
-    <!-- ── REPORT TAB ── -->
+    <!-- REPORT TAB -->
     <div id="tab-content-report" class="tab-content">
       <div class="section-title">📋 DAILY REPORT</div>
       <div id="already-submitted-banner" class="submitted-banner" style="display:none">
         ✅ Already submitted today! Come back tomorrow.
         <div id="today-score-display" class="today-score-show"></div>
       </div>
-
       <div id="report-form-wrap">
         <div class="report-card">
-          <div class="report-field">
-            <label class="field-label">1️⃣ Study Hours</label>
-            <input type="number" id="r-study" class="input-field" min="0" max="24" step="0.5" placeholder="e.g. 3" />
+          <div id="dynamic-report-fields">
+            <!-- Built dynamically by JS based on the group's selected habits -->
           </div>
-
-          <div class="report-field">
-            <label class="field-label">2️⃣ Exercise</label>
-            <div class="toggle-row">
-              <div class="toggle-group">
-                <button class="toggle-btn active" id="ex-yes" onclick="setToggle('exercise','yes')">YES</button>
-                <button class="toggle-btn" id="ex-no" onclick="setToggle('exercise','no')">NO</button>
-              </div>
-              <input type="text" id="r-exercise-type" class="input-field" placeholder="What exercise? (push-ups, run...)" />
-            </div>
-          </div>
-
-          <div class="report-field">
-            <label class="field-label">3️⃣ Cold Shower</label>
-            <div class="toggle-group">
-              <button class="toggle-btn active" id="cs-yes" onclick="setToggle('coldShower','yes')">YES</button>
-              <button class="toggle-btn" id="cs-no" onclick="setToggle('coldShower','no')">NO</button>
-            </div>
-          </div>
-
-          <div class="report-field">
-            <label class="field-label">4️⃣ Diet Plan Followed</label>
-            <div class="toggle-group">
-              <button class="toggle-btn active" id="dp-yes" onclick="setToggle('diet','yes')">YES</button>
-              <button class="toggle-btn" id="dp-no" onclick="setToggle('diet','no')">NO</button>
-            </div>
-          </div>
-
-          <div class="report-field">
-            <label class="field-label">5️⃣ Sleep Schedule Followed</label>
-            <div class="toggle-group">
-              <button class="toggle-btn active" id="sl-yes" onclick="setToggle('sleep','yes')">YES</button>
-              <button class="toggle-btn" id="sl-no" onclick="setToggle('sleep','no')">NO</button>
-            </div>
-          </div>
-
-          <div class="report-field">
-            <label class="field-label">6️⃣ Meditation (minutes)</label>
-            <input type="number" id="r-meditation" class="input-field" min="0" max="120" placeholder="e.g. 10" />
-          </div>
-
           <div class="report-field">
             <label class="field-label">📸 Photo Proof (Live Camera)</label>
             <div class="camera-section">
@@ -188,51 +193,45 @@
             </div>
           </div>
         </div>
-
         <div id="min-day-warning" class="min-warning" style="display:none">
-          ⚠️ MINIMUM DAY RULE: You must complete at least 1hr study + exercise + 5min meditation.
+          ⚠️ Minimum day requirements not fully met. Submitted anyway — push harder tomorrow.
         </div>
-
         <button class="btn-primary btn-full" onclick="submitReport()">⚡ SUBMIT REPORT</button>
         <p id="report-error" class="error-msg"></p>
       </div>
     </div>
 
-    <!-- ── LEADERBOARD TAB ── -->
+    <!-- LEADERBOARD TAB -->
     <div id="tab-content-leaderboard" class="tab-content">
       <div class="section-title">🏆 LEADERBOARD</div>
-      <div class="lb-subtitle">Ranked by consistency & discipline score</div>
+      <div class="lb-subtitle">Ranked by consistency &amp; weekly average score</div>
       <div id="leaderboard-list" class="leaderboard-list"></div>
-
-      <div class="score-legend">
-        <div class="legend-title">SCORE BREAKDOWN (per day)</div>
-        <div class="legend-grid">
-          <span>📚 Study: up to 30pts</span>
-          <span>💪 Exercise: 20pts</span>
-          <span>🚿 Cold Shower: 10pts</span>
-          <span>🥗 Diet: 15pts</span>
-          <span>😴 Sleep: 15pts</span>
-          <span>🧘 Meditation: up to 10pts</span>
-        </div>
-      </div>
+      <div id="score-breakdown-card" class="score-legend"></div>
     </div>
 
-    <!-- ── AI ANALYSIS TAB ── -->
+    <!-- AI TAB -->
     <div id="tab-content-ai" class="tab-content">
       <div class="section-title">🤖 AI ANALYSIS — GEMINI</div>
-      <p class="ai-intro">AI analyzes your last 7 days and reveals your weaknesses, patterns, and a custom action plan.</p>
+      <p class="ai-intro">AI analyzes your last 7 days and reveals weaknesses, patterns, and a custom action plan.</p>
 
-      <button class="btn-primary btn-full" onclick="runAIAnalysis()">⚡ ANALYZE MY PROGRESS</button>
+      <div class="ai-key-box" id="ai-key-box">
+        <label class="field-label">🔑 Gemini API Key</label>
+        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.3rem">
+          <input type="password" id="ai-tab-key-input" class="input-field" placeholder="Paste your AIza... key here" style="flex:1" />
+          <button class="btn-ghost btn-sm" onclick="saveApiKeyFromDashboard()">Save</button>
+        </div>
+        <span id="ai-tab-key-status" class="key-status" style="margin-top:0.3rem;display:block"></span>
+      </div>
 
+      <button class="btn-primary btn-full" onclick="runAIAnalysis()" style="margin-top:0.8rem">⚡ ANALYZE MY PROGRESS</button>
       <div id="ai-loading" class="ai-loading" style="display:none">
         <div class="spinner"></div>
         <p>Gemini is analyzing your discipline data...</p>
       </div>
-
       <div id="ai-result" class="ai-result"></div>
     </div>
 
-    <!-- ── PROFILE TAB ── -->
+    <!-- PROFILE TAB -->
     <div id="tab-content-profile" class="tab-content">
       <div class="profile-header">
         <div class="profile-avatar" id="profile-avatar">?</div>
@@ -242,28 +241,18 @@
           <div class="profile-group" id="profile-group"></div>
         </div>
       </div>
-
       <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-val" id="stat-streak">0</div>
-          <div class="stat-label">🔥 Best Streak</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-val" id="stat-study">0h</div>
-          <div class="stat-label">📚 Total Study</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-val" id="stat-meditation">0m</div>
-          <div class="stat-label">🧘 Total Meditation</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-val" id="stat-avg">0</div>
-          <div class="stat-label">📊 Weekly Avg</div>
-        </div>
+        <div class="stat-card"><div class="stat-val" id="stat-streak">0</div><div class="stat-label">🔥 Best Streak</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-avg">0</div><div class="stat-label">📊 Weekly Avg</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-days">0</div><div class="stat-label">📅 Days Logged</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-top">—</div><div class="stat-label">🏅 Best Day</div></div>
       </div>
 
       <div class="section-title">📅 7-DAY HISTORY</div>
       <div id="history-grid" class="history-grid"></div>
+
+      <div class="section-title" style="margin-top:1.5rem">📈 HABIT BREAKDOWN (Last 7 Days)</div>
+      <div id="habit-breakdown" class="habit-breakdown-list"></div>
 
       <div class="section-title" style="margin-top:1.5rem">🖼️ PROOF PHOTOS</div>
       <div id="proof-gallery" class="proof-gallery"></div>
